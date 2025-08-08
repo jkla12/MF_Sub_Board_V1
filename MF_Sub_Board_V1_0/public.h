@@ -29,6 +29,7 @@
 #include "rtc.h"
 #include "adc.h"
 #include "ntc.h"
+#include "input.h"
 //FreeModbus
 #include "mb.h"
 #include "mbutils.h"

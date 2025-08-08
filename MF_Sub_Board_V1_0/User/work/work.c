@@ -53,13 +53,15 @@ void hw_init(void)
     //初始化串口
     uart0_config(115200);
     uart0_dma_init();
-    eMBInit(MB_RTU, 0x01, 0x01, 115200, MB_PAR_NONE);
+    eMBInit(MB_RTU, 0x02, 0x01, 115200, MB_PAR_NONE);
     eMBEnable();
     Timer = (Timer_TypeDef){0}; // 初始化定时器结构体
     // 其他外设初始化
     dial_init();
     //relay_init();		//MOS输出初始化
     NTC_Init(); // NTC温度传感器初始化
+    level_sensor_init();
+    output_gpio_init(); // 输出GPIO初始化
     elog_init();
 	elog_set_fmt(ELOG_LVL_ASSERT, ELOG_FMT_ALL);
 	elog_set_fmt(ELOG_LVL_ERROR, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME);
@@ -92,6 +94,8 @@ void task_init(void)
 {
     add_task_with_param(led_toggle_param,&led1,NULL, 100, true);    //LED运行指示灯
     add_task(temp_read_task, NULL, 1000, true);                     // 温度读取任务
+    add_task(level_modbus_task, NULL, 100, true);                    // 液位传感器状态读取任务
+    add_task(Output_task, NULL, 100, true);                          // 输出任务
 }
 
 /**
@@ -513,4 +517,17 @@ void temp_read_task(void)
 {
     NTC_Read(&usRegInputBuf[0]); // 读取NTC温度值
 }
+
+/**
+ * ************************************************************************
+ * @brief  液位传感器读取任务函数
+ * 
+ * ************************************************************************
+ */
+void level_modbus_task(void)
+{
+    static LevelSensor_Status_t sensor_status;
+    level_sensor_read(&sensor_status);
+}
+
 

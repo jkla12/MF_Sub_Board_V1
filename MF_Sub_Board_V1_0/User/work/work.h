@@ -126,4 +126,6 @@ void scheduler(void);
 void led_toggle_param(void *led_num);
 void temp_read_task(void);
 
+void level_modbus_task(void);
+
 #endif
